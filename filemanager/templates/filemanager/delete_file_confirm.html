@@ -1,0 +1,18 @@
+{% extends "filemanager/base.html" %}
+
+{% block title %}Удаление файла{% endblock %}
+
+{% block content %}
+    <h2>Подтверждение удаления</h2>
+    
+    <div style="padding: 20px; border: 2px solid red; background-color: #ffcccc; border-radius: 6px;">
+        <p>Вы уверены, что хотите удалить файл: **{{ user_file.filename }}**?</p>
+        <p>Это действие нельзя будет отменить.</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" style="background-color: red; color: white;">Да, удалить навсегда</button>
+            <a href="{% url 'my_files' %}"><button type="button" style="background-color: gray;">Отмена</button></a>
+        </form>
+    </div>
+{% endblock %}

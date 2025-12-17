@@ -1,0 +1,10 @@
+{% extends "filemanager/base.html" %} 
+{% block title %}Выход из системы{% endblock %}
+
+{% block content %}
+    <h2 style="color: var(--color-primary);">Вы вышли из системы</h2>
+    <p>Вы успешно вышли из своей учетной записи.</p>
+    <p>
+        Вы можете <a href="{% url 'login' %}">войти снова</a> или вернуться на <a href="{% url 'home' %}">главную страницу</a>.
+    </p>
+{% endblock %}

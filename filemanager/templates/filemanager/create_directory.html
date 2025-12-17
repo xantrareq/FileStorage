@@ -1,0 +1,27 @@
+{% extends "filemanager/base.html" %}
+
+{% block title %}Создать папку{% endblock %}
+
+{% block content %}
+    <h2>Создание папки</h2>
+
+    {% if parent_directory %}
+        <p>Вы создаете папку внутри: <strong>{{ parent_directory.name }}</strong></p>
+    {% else %}
+        <p>Вы создаете папку в: <strong>Корневой директории</strong></p>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {{ form.as_p }}
+        
+        <button type="submit" style="background-color: #FFD700; color: rgb(0, 0, 0); padding: 10px 15px; border: none; cursor: pointer;">Создать</button>
+        
+        {% if parent_directory %}
+            <a href="{% url 'my_files_in_dir' parent_directory.id %}" style="margin-left: 15px;">Отмена</a>
+        {% else %}
+            <a href="{% url 'my_files' %}" style="margin-left: 15px;">Отмена</a>
+        {% endif %}
+    </form>
+{% endblock %}

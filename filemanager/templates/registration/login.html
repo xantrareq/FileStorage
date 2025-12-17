@@ -1,0 +1,13 @@
+{% extends "filemanager/base.html" %}
+
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+    <h2>Вход в аккаунт</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Войти</button>
+    </form>
+    <p>Нет аккаунта? <a href="{% url 'signup' %}">Зарегистрируйтесь</a>.</p>
+{% endblock %}

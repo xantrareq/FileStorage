@@ -1,0 +1,22 @@
+{% extends "filemanager/base.html" %}
+
+{% block title %}Удаление папки{% endblock %}
+
+{% block content %}
+    <h2>Подтвердите удаление</h2>
+    <p>Вы действительно хотите удалить папку <strong>"{{ directory.name }}"</strong>?</p>
+    <p style="color: red; font-weight: bold;">Внимание: будут удалены все вложенные файлы и папки!</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" style="background-color: red; color: white; padding: 10px 15px; border: none; cursor: pointer;">
+            Удалить навсегда
+        </button>
+        
+        {% if directory.parent %}
+            <a href="{% url 'my_files_in_dir' directory.parent.id %}" style="margin-left: 15px;">Отмена</a>
+        {% else %}
+            <a href="{% url 'my_files' %}" style="margin-left: 15px;">Отмена</a>
+        {% endif %}
+    </form>
+{% endblock %}

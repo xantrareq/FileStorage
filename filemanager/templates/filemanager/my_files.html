@@ -1,0 +1,202 @@
+{% extends "filemanager/base.html" %} 
+{% load static %}
+{% block title %}Мои файлы{% endblock %}
+
+{% block content %}
+    <h2>Ваш Диск</h2>
+    <div class="breadcrumbs" style="margin-bottom: 15px;">
+        <a href="{% url 'my_files' %}">Корневая папка</a> / 
+        {% for dir in breadcrumbs %}
+            <a href="{% url 'my_files_in_dir' dir.id %}">{{ dir.name }}</a> / 
+        {% endfor %}
+    </div>
+
+    <form method="get" style="margin-bottom: 20px;">
+        <input type="text" name="q" placeholder="Поиск файлов и папок..." value="{{ search_query|default:'' }}" style="width: 70%; padding: 8px;">
+        <button type="submit">Найти</button>
+        {% if current_directory %}
+            <input type="hidden" name="directory_id" value="{{ current_directory.id }}">
+        {% endif %}
+    </form>
+    
+    <div style="margin-bottom: 20px;">
+        <button id="showUploadFormBtn" class="action-button">Загрузить файл</button>
+        
+        <a href="{% url 'create_directory' %}{% if current_directory %}?parent_id={{ current_directory.id }}{% endif %}" 
+            class="action-button" 
+            style="background-color: #FFD700; color: #000; padding: 5px 5px; border: none; cursor: pointer; text-decoration: none; display: inline-block; border-radius: 5px; font-family: sans-serif;">
+            Создать папку
+        </a>
+
+        <div id="uploadFormContainer" style="
+            border: 1px solid #ccc; 
+            padding: 20px; 
+            margin-top: 15px; 
+            background-color: #f9f9f9; 
+            display: none; /* Изначально скрываем */
+        ">
+            <h3>Загрузить файл в папку "{% if current_directory %}{{ current_directory.name }}{% else %}Корневая папка{% endif %}"</h3>
+            
+            <form method="post" action="{% url 'upload_file' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                {{ upload_form.as_p }} {% if current_directory %}
+                    <input type="hidden" name="directory_id" value="{{ current_directory.id }}">
+                {% endif %}
+
+                <button type="submit">Загрузить</button>
+                <button type="button" id="hideUploadFormBtn">Отмена</button>
+            </form>
+        </div>
+    </div>
+    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+    <thead>
+        <tr style="background-color: var(--color-primary);">
+            <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Имя</th>
+            <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Тип</th>
+            <th style="padding: 10px; border: 1px solid #ccc; text-align: left;">Дата</th>
+            <th style="padding: 10px; border: 1px solid #ccc; text-align: center;">Действия</th>
+            <th style="padding: 10px; border: 1px solid #ccc; text-align: center;">Общий доступ</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in page_obj %}
+            <tr style="background-color: {% cycle 'white' '#fffbf0' %};">
+                <td style="padding: 10px; border: 1px solid #eee;">
+                    {% if item.name %} 
+                        <span style="color: #FFD700;">📁</span> 
+                        <a href="{% url 'my_files_in_dir' item.id %}" style="font-weight: bold;">{{ item.name }}</a>
+                    {% else %}
+                        <span style="color: #888;">📄</span> 
+                        {{ item.filename }}
+                    {% endif %}
+                </td>
+                
+                <td style="padding: 10px; border: 1px solid #eee;">
+                    {% if item.name %} Папка {% else %} Файл {% endif %}
+                </td>
+                
+                <td style="padding: 10px; border: 1px solid #eee;">
+                    {% if item.name %} 
+                        {{ item.created_at|date:"d.m.Y H:i" }} 
+                    {% else %} 
+                        {{ item.upload_date|date:"d.m.Y H:i" }} 
+                    {% endif %}
+                </td>
+                
+                <td style="padding: 10px; border: 1px solid #eee; text-align: center;">
+                    {% if item.name %}
+                        <a href="{% url 'delete_directory' item.id %}" style="color: red; text-decoration: none;">Удалить</a>
+                    {% else %}
+                        <a href="{% url 'download_file' item.id %}" style="color: green; text-decoration: none;">Скачать</a> |
+                        <a href="{% url 'delete_file' item.id %}" style="color: red; text-decoration: none;">Удалить</a>
+                    {% endif %}
+                </td>
+
+                <td style="padding: 10px; border: 1px solid #eee; text-align: left;">
+    {% if not item.name %}
+        
+        <a href="{% url 'toggle_share' item.id %}" 
+            style="padding: 3px 6px; border-radius: 4px; text-decoration: none; font-size: 11px; display: inline-block; background-color: {% if item.is_shared %}#ffc107; color: #000;{% else %}#007bff; color: white;{% endif %};"
+        >
+            {% if item.is_shared %}🚷 Отключить{% else %}🌐 Поделиться{% endif %}
+        </a>
+        
+       {% if item.is_shared and item.share_token %}
+    
+    {% url 'public_download' token=item.share_token as share_link %}
+    
+    {% with host_and_scheme=request.scheme|add:'://'|add:request.get_host %}
+        
+        <div style="margin-top: 5px; background-color: #f0f8ff; border: 1px solid #cce5ff; padding: 3px; border-radius: 4px;">
+            
+            <strong style="font-size: 10px;">Активна до: 
+                <span class="local-time-display" 
+                      data-timestamp="{{ item.share_expires_at|date:'U' }}">
+                    {{ item.share_expires_at|date:"d.m.Y H:i" }} 
+                </span>
+            </strong>
+            
+            <div style="font-size: 10px; margin-top: 3px; word-break: break-all; display: flex; align-items: center;">
+                
+                <input type="text" value="{{ host_and_scheme }}{{ share_link }}" 
+                    id="share-link-{{ item.id }}" 
+                    readonly 
+                    style="flex-grow: 1; border: 1px solid #ddd; padding: 2px; background-color: white; font-family: monospace; font-size: 10px; overflow: hidden; text-overflow: ellipsis;"
+                >
+                
+                <button 
+                    onclick="copyShareLink('share-link-{{ item.id }}')"
+                    style="margin-left: 5px; padding: 3px 6px; font-size: 10px; background-color: #28a745; color: white; border: none; border-radius: 3px; cursor: pointer; white-space: nowrap;"
+                >
+                    📋 Копировать
+                </button>
+            </div>
+            
+        </div>
+    {% endwith %}
+{% endif %}
+        
+    {% endif %}
+</td>
+                
+            </tr>
+        {% empty %}
+            <tr><td colspan="5">Папка пуста или по вашему запросу ничего не найдено.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+    <script>
+        // ... (Существующий JS для формы загрузки) ...
+        document.getElementById('showUploadFormBtn').onclick = function() {
+             document.getElementById('uploadFormContainer').style.display = 'block';
+         };
+         document.getElementById('hideUploadFormBtn').onclick = function() {
+             document.getElementById('uploadFormContainer').style.display = 'none';
+         };
+
+        // НОВАЯ ФУНКЦИЯ КОПИРОВАНИЯ
+        function copyShareLink(elementId) {
+            const copyText = document.getElementById(elementId);
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); // Для мобильных
+            document.execCommand("copy");
+            alert("Ссылка скопирована в буфер обмена!");
+        }
+        function convertUTCToLocalTime() {
+        const timeElements = document.querySelectorAll('.local-time-display');
+
+        timeElements.forEach(element => {
+            const unixTimestampSeconds = element.dataset.timestamp;
+
+            if (unixTimestampSeconds) {
+                // 1. Конвертируем секунды в миллисекунды для объекта Date
+                const date = new Date(unixTimestampSeconds * 1000);
+                
+                // 2. Определяем опции форматирования
+                const options = { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    hour12: false // Используем 24-часовой формат
+                };
+                
+                // 3. Используем Intl.DateTimeFormat для локальной адаптации
+                try {
+                    // Используем ru-RU для русского формата даты (DD.MM.YYYY)
+                    const localTimeString = new Intl.DateTimeFormat('ru-RU', options).format(date);
+                    element.textContent = localTimeString;
+                } catch (e) {
+                    // Резервный вариант, если Intl не поддерживается
+                    element.textContent = date.toLocaleString('ru-RU', options);
+                }
+            }
+        });
+    }
+    </script>
+    
+{% endblock %}
+

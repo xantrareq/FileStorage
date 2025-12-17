@@ -1,0 +1,133 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Облачное Хранилище{% endblock %}</title>
+    
+    <style>
+        :root {
+            --color-primary: #FFD700; /* Золотисто-желтый */
+            --color-secondary: #000000; /* Черный */
+            --color-background: #F8F8F8; /* Светло-серый/белый */
+            --color-text: #333333;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-background);
+            color: var(--color-text);
+        }
+        header {
+            background-color: var(--color-secondary);
+            color: var(--color-primary);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        header a {
+            color: var(--color-primary);
+            text-decoration: none;
+            padding: 8px 15px;
+            margin-left: 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        header a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--color-primary);
+        }
+        main {
+            padding: 20px;
+            max-width: 1000px;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+        }
+        .message {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #e0ffe0; color: #1e6e1e; border: 1px solid #1e6e1e; }
+        .error { background-color: #ffe0e0; color: #cc0000; border: 1px solid #cc0000; }
+        .warning { background-color: #ffffe0; color: #8a6d3b; border: 1px solid #8a6d3b; }
+
+        /* Стили для форм */
+        form label { display: block; margin-top: 10px; font-weight: bold; }
+        form input[type="text"], form input[type="password"], form input[type="email"], form input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button[type="submit"] {
+            background-color: var(--color-primary);
+            color: var(--color-secondary);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: opacity 0.3s;
+        }
+        button[type="submit"]:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">CloudStorage</div>
+        <nav>
+            <a href="{% url 'home' %}">Главная</a>
+            
+            {% if user.is_authenticated %}
+                <a href="{% url 'my_files' %}">Мои файлы</a>
+                <a href="{% url 'upload_file' %}">Загрузить</a>
+                <span>({{ user.username }})</span>
+                
+                <form action="{% url 'logout' %}" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="submit" style="
+                        background: none; 
+                        border: none; 
+                        color: var(--color-primary); 
+                        cursor: pointer;
+                        padding: 0;
+                        margin-left: 10px;
+                        font-size: 1em;
+                        text-decoration: underline;
+                    ">Выход</button>
+                </form>
+                
+            {% else %}
+                <a href="{% url 'login' %}">Вход</a>
+                <a href="{% url 'signup' %}">Регистрация</a>
+            {% endif %}
+        </nav>
+    </header>
+    
+    <main>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
