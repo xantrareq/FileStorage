@@ -21,7 +21,6 @@
 ### Страница регистрации
 ![image](https://github.com/user-attachments/assets/7b410008-d391-4ab1-9ba2-6adbbdd2d87a)
 ### После этого пользователь может перейти в свое хранилище, чтобы управлять оттуда своими файлами.
-![image](https://github.com/user-attachments/assets/84d2387f-2548-44cb-bacb-14ddd5bde384)
 ### Диск с файлами
 ![image](https://github.com/user-attachments/assets/6e794c85-b1a8-4005-b5b3-563cd56ad198)
 ### Вы можете создавать систему папок!
