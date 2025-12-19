@@ -1,7 +1,12 @@
 # CloudStorage
 # Система удаленного хранения файлов.
 
-Это веб-приложение, которое позволяет вам хранить свои файлы на удаленном сервере, а также делиться ими с другими пользователями
+### Это веб-приложение, которое позволяет вам хранить свои файлы на удаленном сервере, а также делиться ими с другими пользователями
+### Разработано на Python с использованием django
+<img src="https://github.com/user-attachments/assets/62fc025f-49a6-44cf-bd55-0098b44dbf0d" width="150" align="left">
+<img src="https://github.com/user-attachments/assets/06861e82-d7be-454f-9be3-9202bbf2e4c5" width="150" align="left">
+<br clear="left"/>
+
 (https://xantra.pythonanywhere.com/)
 ## Возможности
 
