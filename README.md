@@ -23,7 +23,7 @@
 ### После этого пользователь может перейти в свое хранилище, чтобы управлять оттуда своими файлами.
 ![image](https://github.com/user-attachments/assets/84d2387f-2548-44cb-bacb-14ddd5bde384)
 ### Диск с файлами
-![image](https://github.com/user-attachments/assets/1121db73-4598-4c26-85b4-44e6e2886f5a)
+![image](https://github.com/user-attachments/assets/6e794c85-b1a8-4005-b5b3-563cd56ad198)
 ### Вы можете создавать систему папок!
 ![image](https://github.com/user-attachments/assets/30d7f5a9-5806-4d90-834d-15cd8fce288f)
 ### Можете загружать файлы!
